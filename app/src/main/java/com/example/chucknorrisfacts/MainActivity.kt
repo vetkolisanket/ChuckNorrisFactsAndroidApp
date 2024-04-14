@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
+import com.bumptech.glide.Glide
 import com.example.chucknorrisfacts.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.getFact()
         viewModel.getFactLD().observe(this) {
             binding.tvFact.text = it.value
+            Glide.with(this).load(it.iconUrl).into(binding.ivImage)
         }
         binding.btnNext.setOnClickListener { viewModel.getFact() }
     }
