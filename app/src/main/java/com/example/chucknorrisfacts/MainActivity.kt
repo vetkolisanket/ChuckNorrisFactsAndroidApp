@@ -1,28 +1,53 @@
 package com.example.chucknorrisfacts
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStore
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Button
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.bumptech.glide.Glide
 import com.example.chucknorrisfacts.databinding.ActivityMainBinding
+import com.example.chucknorrisfacts.theme.SunflowerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel : MainViewModel by viewModels()
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        viewModel.getFact()
-        viewModel.getFactLD().observe(this) {
-            binding.tvFact.text = it.value
-            Glide.with(this).load(it.iconUrl).into(binding.ivImage)
+        setContent {
+            SunflowerTheme {
+                Surface {
+                    Main(viewModel = viewModel)
+                }
+            }
         }
-        binding.btnNext.setOnClickListener { viewModel.getFact() }
+        viewModel.getFact()
+    }
+
+    @Composable
+    fun Main(viewModel: MainViewModel) {
+        val fact by viewModel.getFactLD().observeAsState()
+        Column(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = fact?.value ?: "",
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Button(onClick = { viewModel.getFact() }) {
+                Text(text = "Next")
+            }
+        }
     }
 }
