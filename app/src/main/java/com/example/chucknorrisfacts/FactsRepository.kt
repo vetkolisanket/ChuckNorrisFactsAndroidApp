@@ -1,16 +1,9 @@
 package com.example.chucknorrisfacts
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-object FactsRepository {
+class FactsRepository @Inject constructor(private val service: IFactsService) {
 
-    private val service by lazy { RestClient.getFactsService() }
-
-    suspend fun getFact(): Fact {
-        return withContext(Dispatchers.IO) {
-            service.getFact()
-        }
-    }
+    suspend fun getFact() = service.getFact()
 
 }
