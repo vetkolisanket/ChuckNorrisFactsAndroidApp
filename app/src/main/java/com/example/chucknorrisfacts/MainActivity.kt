@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.bumptech.glide.Glide
-import com.example.chucknorrisfacts.databinding.ActivityMainBinding
 import com.example.chucknorrisfacts.theme.SunflowerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,12 +39,19 @@ class MainActivity : AppCompatActivity() {
 
     @Composable
     fun Main(viewModel: MainViewModel) {
-        val fact by viewModel.getFactLD().observeAsState()
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = fact?.value ?: "",
-                modifier = Modifier.fillMaxWidth(),
-            )
+        val state = viewModel.factStateFlow.collectAsState()
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (state.value is UIState.Loading) {
+                CircularProgressIndicator()
+            } else if (state.value is UIState.Success) {
+                Text(
+                    text = (state.value as UIState.Success).data.value,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             Button(onClick = { viewModel.getFact() }) {
                 Text(text = "Next")
             }
